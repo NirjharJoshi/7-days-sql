@@ -96,7 +96,25 @@ JOIN
 GROUP BY LearnerId) AS t
 	ON l.Id = t.LearnerId
 GROUP BY t.LearnerId;
-    
+
+-- display premium learners
+-- total_orders > average_orders
+SELECT * FROM Orders;
+
+WITH FinalOrder AS (
+	WITH CountAndAvgOrder AS (
+		WITH CountOfOrders AS (
+			SELECT LearnerId, COUNT(Id) AS OrderCount FROM Orders
+			GROUP BY LearnerId
+		) 
+		SELECT *, AVG(OrderCount) OVER() AS AvgOrder FROM CountOfOrders
+	) 
+	SELECT * FROM CountAndAvgOrder
+	WHERE OrderCount > AvgOrder
+)
+SELECT o.LearnerId, l.FirstName, l.LastName, o.OrderCount, o.AvgOrder FROM FinalOrder AS o
+JOIN Learner AS l
+	ON o.LearnerId = l.Id;
     
     
     
